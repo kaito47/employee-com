@@ -25,12 +25,14 @@ connection.connect(function (err) {
 // function which uses inquirer to prompt the user for what action they an take
 function start() {
     inquirer
-        .prompt({
-            name: "allOptions",
-            type: "list",
-            message: "What would you like to do?",
-            choices: ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", "View All Employee Roles", "View All Employee Departments"],
-        })
+        .prompt([
+            {
+                name: "allOptions",
+                type: "list",
+                message: "What would you like to do?",
+                choices: ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", "View All Employee Roles", "View All Employee Departments", "Add New Role", "Add New Department"],
+            }
+        ])
         .then(function (answer) {
             switch (answer.allOptions) {
                 case "View All Employees":
@@ -60,6 +62,14 @@ function start() {
 
                 case "View All Employee Departments":
                     viewAllDepartments();
+                    break;
+
+                case "Add New Role":
+                    addRole();
+                    break;
+
+                case "Add New Department":
+                    addDepartment();
                     break;
 
                 case "exit":
@@ -145,7 +155,7 @@ function viewAllRoles() {
             console.table(res);
             if (err) throw err;
         })
-}
+};
 
 function viewAllDepartments() {
     connection.query('SELECT department.id, department.department FROM department',
@@ -153,7 +163,7 @@ function viewAllDepartments() {
             console.table(res);
             if (err) throw err;
         })
-}
+};
 
 function viewByDepartment() {
     connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id',
@@ -161,4 +171,44 @@ function viewByDepartment() {
             console.table(res);
             if (err) throw err;
         })
-}
+};
+
+function addRole() {
+    inquirer
+        .prompt([
+            {
+                name: "role",
+                type: "input",
+                message: "What is the name of the role you'd like to add?"
+            },
+
+            {
+                name: "roleDepartment",
+                type: "",
+                message: "What is the name of the role you'd like to add?"
+            }
+        ]).then(function (answer) {
+
+        }
+        )
+
+};
+
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                name: "department",
+                type: "input",
+                message: "What is the name of the department you'd like to add?"
+            },
+        ]).then(function (answer) {
+            connection.query('INSERT INTO department SET ?', { department: answer.department },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log("You added a department!")
+                })
+
+        }
+        )
+};
