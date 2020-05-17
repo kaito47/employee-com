@@ -78,7 +78,7 @@ function addEmployee() {
                 name: "role",
                 type: "list",
                 message: "What is the employee's role?",
-                choices: ["Manager", "Engineer", "Lawyer", "Accountant", "Designer", "Marketing Associate", "Custodian"]
+                choices: ["Lead Engineer", "Software Engineer", "Legal Team Lead", "Lawyer", "Account Manager", "Accountant", "Sales Lead", "Salesperson"]
             }])
         .then(function (answer) {
             switch (answer.role) {
