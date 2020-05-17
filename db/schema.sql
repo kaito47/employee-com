@@ -4,7 +4,7 @@ USE employeeCOM_DB;
 
 CREATE TABLE department (
     id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR (30),
+    department VARCHAR (30),
     PRIMARY KEY (id)
 );
 
@@ -26,10 +26,10 @@ CREATE TABLE employee (
     FOREIGN KEY (role_id) REFERENCES role (id)
 );
 
-INSERT INTO department (name) VALUES ("Sales");
-INSERT INTO department (name) VALUES ("Engineering");
-INSERT INTO department (name) VALUES ("Finance");
-INSERT INTO department (name) VALUES ("Legal");
+INSERT INTO department (department) VALUES ("Sales");
+INSERT INTO department (department) VALUES ("Engineering");
+INSERT INTO department (department) VALUES ("Finance");
+INSERT INTO department (department) VALUES ("Legal");
 
 -- INSERT INTO role (title, salary) VALUES ("Manager", 250,000);
 INSERT INTO role (title, salary, department_id) VALUES ("Sales Lead", 120000, 1);

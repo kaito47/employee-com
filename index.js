@@ -78,22 +78,44 @@ function addEmployee() {
                 name: "role",
                 type: "list",
                 message: "What is the employee's role?",
-                choices: ["Lead Engineer", "Software Engineer", "Legal Team Lead", "Lawyer", "Account Manager", "Accountant", "Sales Lead", "Salesperson"]
+                choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer"]
             }])
         .then(function (answer) {
             switch (answer.role) {
-                case "Manager":
-                    return answer.role = "12";
-                //finish up the cases to convert to role id's
-
-
+                case "Sales Lead":
+                    answer.role = "1";
+                    break;
+                case "Salesperson":
+                    answer.role = "2";
+                    break;
+                case "Lead Engineer":
+                    answer.role = "3";
+                    break;
+                case "Software Engineer":
+                    answer.role = "4";
+                    break;
+                case "Account Manager":
+                    answer.role = "5";
+                    break;
+                case "Accountant":
+                    answer.role = "6";
+                    break;
+                case "Legal Team Lead":
+                    answer.role = "7";
+                    break;
+                case "Lawyer":
+                    answer.role = "8";
+                    break;
             }
-            let queryE = "INSERT INTO employee SET ? ?";
-            connection.query(queryE, { first_name: answer.first_name, last_name: answer.last_name, role: answer.role },
+
+            let queryE = "INSERT INTO employee SET ?";
+            connection.query(queryE, { first_name: answer.first_name, last_name: answer.last_name, role_id: answer.role },
                 function (err, res) {
                     if (err) throw err;
                     console.log("You added an employee!")
                 })
+
+
 
 
         })
@@ -101,11 +123,10 @@ function addEmployee() {
 };
 
 function viewAllEmployees() {
-    connection.query('SELECT * FROM employeeCOM_db.employee',
+    connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id',
         function (err, res) {
-            console.log(res)
+            console.table(res);
             if (err) throw err;
-            console.log("You added an employee!")
         })
 
 }
