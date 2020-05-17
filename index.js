@@ -29,7 +29,7 @@ function start() {
             name: "allOptions",
             type: "list",
             message: "What would you like to do?",
-            choices: ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager"],
+            choices: ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", "View All Employee Roles", "View All Employee Departments"],
         })
         .then(function (answer) {
             switch (answer.allOptions) {
@@ -52,6 +52,14 @@ function start() {
 
                 case "Update Employee Role":
                     udpateEmployeeRole();
+                    break;
+
+                case "View All Employee Roles":
+                    viewAllRoles();
+                    break;
+
+                case "View All Employee Departments":
+                    viewAllDepartments();
                     break;
 
                 case "exit":
@@ -129,4 +137,28 @@ function viewAllEmployees() {
             if (err) throw err;
         })
 
+};
+
+function viewAllRoles() {
+    connection.query('SELECT role.id, role.title, role.salary FROM role',
+        function (err, res) {
+            console.table(res);
+            if (err) throw err;
+        })
+}
+
+function viewAllDepartments() {
+    connection.query('SELECT department.id, department.department FROM department',
+        function (err, res) {
+            console.table(res);
+            if (err) throw err;
+        })
+}
+
+function viewByDepartment() {
+    connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id',
+        function (err, res) {
+            console.table(res);
+            if (err) throw err;
+        })
 }
