@@ -80,70 +80,103 @@ function start() {
 };
 // building case functions
 function addEmployee() {
-    inquirer
-        .prompt([
-            {
-                name: "first_name",
-                type: "input",
-                message: "What is the employee's first name?",
-            },
-            {
-                name: "last_name",
-                type: "input",
-                message: "What is the employee's last name?"
-            },
-            {
-                name: "role",
-                type: "list",
-                message: "What is the employee's role?",
-                choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Other"]
-            }])
-        .then(function (answer) {
-            switch (answer.role) {
-                case "Sales Lead":
-                    answer.role = "1";
-                    break;
-                case "Salesperson":
-                    answer.role = "2";
-                    break;
-                case "Lead Engineer":
-                    answer.role = "3";
-                    break;
-                case "Software Engineer":
-                    answer.role = "4";
-                    break;
-                case "Account Manager":
-                    answer.role = "5";
-                    break;
-                case "Accountant":
-                    answer.role = "6";
-                    break;
-                case "Legal Team Lead":
-                    answer.role = "7";
-                    break;
-                case "Lawyer":
-                    answer.role = "8";
-                    break;
-                case "Other":
-                    otherRoles();
-                    //left blank role
-                    // answer.role = "";
-                    break;
-            }
+    connection.query("SELECT role.title FROM role",
+        function (err, res) {
+            if (err) throw err;
+            inquirer
+                .prompt([
+                    {
+                        name: "first_name",
+                        type: "input",
+                        message: "What is the employee's first name?",
+                    },
+                    {
+                        name: "last_name",
+                        type: "input",
+                        message: "What is the employee's last name?"
+                    },
 
-            // let queryE = "INSERT INTO employee SET ?";
-            // connection.query(queryE, { first_name: answer.first_name, last_name: answer.last_name, role_id: answer.role },
-            //     function (err, res) {
-            //         if (err) throw err;
-            //         console.log("You added an employee!")
-            //     })
+                    {
+                        name: "roleChoice",
+                        type: "rawlist",
+                        choices: function () {
+                            var choiceArray = [];
+                            for (var i = 0; i < res.length; i++) {
+                                choiceArray.push(res[i].title);
+                            }
+                            return choiceArray;
+                        },
+                        message: "What is the employee's role?"
+                    }
 
 
+                ]).then(function (answer) {
+                    connection.query("SELECT role.id FROM role WHERE ? ", { title: answer.roleChoice }, function (err, res) {
+                        let roleID = res[0].id
+                        connection.query("INSERT INTO employee SET ? ",
+                            {
+                                first_name: answer.first_name,
+                                last_name: answer.last_name,
+                                role_id: roleID
+                            },
+                            function (err, res) {
+                                if (err) throw err;
+                                return res;
+                            })
+                    }
+                    )
+                }
+                )
+        }
+    )
+}
+// {
+//     name: "role",
+//     type: "list",
+//     message: "What is the employee's role?",
+//     choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Other"]
+// }])
+// .then(function (answer) {
 
 
-        })
 
-};
+// switch (answer.role) {
+//     case "Sales Lead":
+//         answer.role = "1";
+//         break;
+//     case "Salesperson":
+//         answer.role = "2";
+//         break;
+//     case "Lead Engineer":
+//         answer.role = "3";
+//         break;
+//     case "Software Engineer":
+//         answer.role = "4";
+//         break;
+//     case "Account Manager":
+//         answer.role = "5";
+//         break;
+//     case "Accountant":
+//         answer.role = "6";
+//         break;
+//     case "Legal Team Lead":
+//         answer.role = "7";
+//         break;
+//     case "Lawyer":
+//         answer.role = "8";
+//         break;
+//     case "Other":
+//         otherRoles();
+//         //left blank role
+//         // answer.role = "";
+//         break;
+// }
+
+
+
+// })
+
+// };
 
 function otherRoles() {
     connection.query('SELECT role.title FROM role',
@@ -256,30 +289,5 @@ function addDepartment() {
         }
         )
 };
-
-// function addDepartment() {
-//     let departmentChoices =
-//         connection.query('SELECT department.department FROM department',
-//             function (err, res) {
-//                 for (var i = 0; i < res.length; i++) {
-//                     console.log(res[i].department);
-//                 }
-//             })
-//     inquirer
-//         .prompt([
-
-//             {
-//                 name: "department",
-//                 type: "choices",
-//                 choices: ["departmentChoices"],
-//             },
-//         ]).then(function (answer) {
-//             if (err) throw err;
-//             console.log("not wanted");
-
-//         }
-//         )
-
-// };
 
 
