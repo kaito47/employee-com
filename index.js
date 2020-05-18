@@ -30,7 +30,7 @@ function start() {
                 name: "allOptions",
                 type: "list",
                 message: "What would you like to do?",
-                choices: ["View All Employees", "View All Employees By Department", "Add Employee", "Update Employee Role", "View All Employee Roles", "View All Employee Departments", "Add New Role", "Add New Department"],
+                choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Employees By Department", "Add New Role", "View All Employee Roles", "Add New Department", "View All Employee Departments"],
             }
         ])
         .then(function (answer) {
