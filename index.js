@@ -96,7 +96,7 @@ function addEmployee() {
                 name: "role",
                 type: "list",
                 message: "What is the employee's role?",
-                choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer"]
+                choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Other"]
             }])
         .then(function (answer) {
             switch (answer.role) {
@@ -124,14 +124,19 @@ function addEmployee() {
                 case "Lawyer":
                     answer.role = "8";
                     break;
+                case "Other":
+                    otherRoles();
+                    //left blank role
+                    // answer.role = "";
+                    break;
             }
 
-            let queryE = "INSERT INTO employee SET ?";
-            connection.query(queryE, { first_name: answer.first_name, last_name: answer.last_name, role_id: answer.role },
-                function (err, res) {
-                    if (err) throw err;
-                    console.log("You added an employee!")
-                })
+            // let queryE = "INSERT INTO employee SET ?";
+            // connection.query(queryE, { first_name: answer.first_name, last_name: answer.last_name, role_id: answer.role },
+            //     function (err, res) {
+            //         if (err) throw err;
+            //         console.log("You added an employee!")
+            //     })
 
 
 
@@ -140,6 +145,13 @@ function addEmployee() {
 
 };
 
+function otherRoles() {
+    connection.query('SELECT role.title FROM role',
+        function (err, res) {
+            console.log(res.title);
+            if (err) throw err;
+        })
+}
 function viewAllEmployees() {
     connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id',
         function (err, res) {
@@ -153,6 +165,7 @@ function viewAllRoles() {
     connection.query('SELECT role.id, role.title, role.salary FROM role',
         function (err, res) {
             console.table(res);
+            console.log(res);
             if (err) throw err;
         })
 };
@@ -174,24 +187,55 @@ function viewByDepartment() {
 };
 
 function addRole() {
-    inquirer
-        .prompt([
-            {
-                name: "role",
-                type: "input",
-                message: "What is the name of the role you'd like to add?"
-            },
+    connection.query("SELECT department.department FROM department",
+        function (err, res) {
+            if (err) throw err;
+            inquirer
+                .prompt([
+                    {
+                        name: "role",
+                        type: "input",
+                        message: "What is the name of the role you'd like to add?"
+                    },
 
-            {
-                name: "roleDepartment",
-                type: "",
-                message: "What is the name of the role you'd like to add?"
-            }
-        ]).then(function (answer) {
+                    {
+                        name: "salary",
+                        type: "input",
+                        message: "What is the salary for this role? (Please use integers only - no commas!)"
+                    },
 
-        }
-        )
+                    {
+                        name: "roleDepartment",
+                        type: "rawlist",
+                        choices: function () {
+                            var choiceArray = [];
+                            for (var i = 0; i < res.length; i++) {
+                                choiceArray.push(res[i].department);
+                            }
+                            return choiceArray;
+                        },
+                        message: "To which department does this role belong?"
+                    }
 
+
+                ]).then(function (answer) {
+                    connection.query("SELECT department.id FROM department WHERE ? ", { department: answer.roleDepartment }, function (err, res) {
+                        let departmentID = res[0].id
+                        connection.query("INSERT INTO role SET ? ",
+                            {
+                                title: answer.role,
+                                salary: answer.salary,
+                                department_id: departmentID
+                            },
+                            function (err, res) {
+                                if (err) throw err;
+                                return res;
+                            })
+                    }
+                    )
+                }
+                )
+        })
 };
 
 function addDepartment() {
@@ -212,3 +256,30 @@ function addDepartment() {
         }
         )
 };
+
+// function addDepartment() {
+//     let departmentChoices =
+//         connection.query('SELECT department.department FROM department',
+//             function (err, res) {
+//                 for (var i = 0; i < res.length; i++) {
+//                     console.log(res[i].department);
+//                 }
+//             })
+//     inquirer
+//         .prompt([
+
+//             {
+//                 name: "department",
+//                 type: "choices",
+//                 choices: ["departmentChoices"],
+//             },
+//         ]).then(function (answer) {
+//             if (err) throw err;
+//             console.log("not wanted");
+
+//         }
+//         )
+
+// };
+
+
