@@ -48,10 +48,6 @@ function start() {
                     addEmployee();
                     break;
 
-                case "Remove Employee":
-                    removeEmployee();
-                    break;
-
                 case "Update Employee Role":
                     udpateEmployeeRole();
                     break;
@@ -78,7 +74,7 @@ function start() {
             }
         });
 };
-// building case functions
+
 function addEmployee() {
     connection.query("SELECT role.title FROM role",
         function (err, res) {
@@ -121,7 +117,7 @@ function addEmployee() {
                             },
                             function (err, res) {
                                 if (err) throw err;
-                                return res;
+                                start();
                             })
                     }
                     )
@@ -129,67 +125,16 @@ function addEmployee() {
                 )
         }
     )
+
 }
-// {
-//     name: "role",
-//     type: "list",
-//     message: "What is the employee's role?",
-//     choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead", "Lawyer", "Other"]
-// }])
-// .then(function (answer) {
 
 
-
-// switch (answer.role) {
-//     case "Sales Lead":
-//         answer.role = "1";
-//         break;
-//     case "Salesperson":
-//         answer.role = "2";
-//         break;
-//     case "Lead Engineer":
-//         answer.role = "3";
-//         break;
-//     case "Software Engineer":
-//         answer.role = "4";
-//         break;
-//     case "Account Manager":
-//         answer.role = "5";
-//         break;
-//     case "Accountant":
-//         answer.role = "6";
-//         break;
-//     case "Legal Team Lead":
-//         answer.role = "7";
-//         break;
-//     case "Lawyer":
-//         answer.role = "8";
-//         break;
-//     case "Other":
-//         otherRoles();
-//         //left blank role
-//         // answer.role = "";
-//         break;
-// }
-
-
-
-// })
-
-// };
-
-function otherRoles() {
-    connection.query('SELECT role.title FROM role',
-        function (err, res) {
-            console.log(res.title);
-            if (err) throw err;
-        })
-}
 function viewAllEmployees() {
     connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id',
         function (err, res) {
             console.table(res);
             if (err) throw err;
+            start();
         })
 
 };
@@ -200,7 +145,9 @@ function viewAllRoles() {
             console.table(res);
             console.log(res);
             if (err) throw err;
+            start();
         })
+
 };
 
 function viewAllDepartments() {
@@ -208,7 +155,9 @@ function viewAllDepartments() {
         function (err, res) {
             console.table(res);
             if (err) throw err;
+            start();
         })
+
 };
 
 function viewByDepartment() {
@@ -216,8 +165,59 @@ function viewByDepartment() {
         function (err, res) {
             console.table(res);
             if (err) throw err;
+            start();
         })
+
 };
+
+function udpateEmployeeRole() {
+    connection.query("SELECT role.title FROM role",
+        function (err, res) {
+            if (err) throw err;
+            inquirer
+                .prompt([
+                    {
+                        name: "employeeID",
+                        type: "input",
+                        message: "What is the ID of the employee whose role will be changed?"
+                    },
+                    {
+                        name: "roleChoice",
+                        type: "rawlist",
+                        choices: function () {
+                            var choiceArray = [];
+                            for (var i = 0; i < res.length; i++) {
+                                choiceArray.push(res[i].title);
+                            }
+                            return choiceArray;
+                        },
+                        message: "Choose the employee's new role:"
+                    }
+
+
+                ]).then(function (answer) {
+                    connection.query("SELECT role.id FROM role WHERE ? ", { title: answer.roleChoice }, function (err, res) {
+                        let newRoleID = res[0].id
+                        connection.query("UPDATE employee SET ? WHERE ? ",
+                            [
+                                {
+                                    role_id: newRoleID
+                                },
+                                {
+                                    id: answer.employeeID
+                                },
+                            ],
+                            function (err, res) {
+                                if (err) throw err;
+                                console.log("Role successfully updated!");
+                                start();
+                            })
+                    }
+                    )
+                }
+                )
+        })
+}
 
 function addRole() {
     connection.query("SELECT department.department FROM department",
@@ -262,13 +262,14 @@ function addRole() {
                             },
                             function (err, res) {
                                 if (err) throw err;
-                                return res;
+                                start();
                             })
                     }
                     )
                 }
                 )
         })
+
 };
 
 function addDepartment() {
@@ -284,10 +285,12 @@ function addDepartment() {
                 function (err, res) {
                     if (err) throw err;
                     console.log("You added a department!")
+                    start();
                 })
 
         }
         )
+
 };
 
 
