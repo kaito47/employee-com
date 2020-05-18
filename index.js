@@ -181,25 +181,16 @@ function viewByDepartment() {
                         message: "Choose the department ID you'd like to view:"
                     }
                 ]).then(function (answer) {
-                    // connection.query("SELECT department.id FROM department WHERE ? ", { department: answer.department }, function (err, res) {
-                    //     let departmentID = res[0].id
-                    //     departmentID = department.id;
-                    connection.query("SELECT ? FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ",
-                        {
-                            id: employee.id,
-                            first_name: employee.first_name,
-                            last_name: employee.last_name,
-                            role: role.title,
-                            department: answer.department,
-                            salary: role.salary
-                        },
-                        function (err, res) {
-                            if (err) throw err;
-                            console.table(res);
-                            // start();
-                        })
-                    // }
-                    // )
+                    connection.query("SELECT department.id FROM department WHERE ? ", { department: answer.department }, function (err, res) {
+                        let departmentID = res[0].id
+                        connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id WHERE ? ", { department_id: departmentID },
+                            function (err, res) {
+                                if (err) throw err;
+                                console.table(res);
+                                start();
+                            })
+                    }
+                    )
                 }
                 )
         })
